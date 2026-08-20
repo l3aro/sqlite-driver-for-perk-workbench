@@ -157,6 +157,7 @@ func (Factory) Capabilities() driver.Capabilities {
 	return driver.Capabilities{
 		Name:              "sqlite",
 		Display:           "SQLite",
+		Targets:           []driver.TargetPattern{{Prefix: "sqlite:"}},
 		Form:              &driver.FormSpec{Fields: []driver.FormField{{Key: "target", Title: "Target*", Kind: driver.FormFieldInput, Placeholder: "path/to/database.db or :memory:", Validate: driver.FormValidationRequired, Error: "target is required"}}},
 		QueryLanguage:     &driver.QueryLanguage{Name: "SQL", EditorLabel: "SQL", Placeholder: "Enter a query…", Lexer: "sql"},
 		WriteCapabilities: driver.WriteCapabilities{RowWriter: true},
@@ -164,6 +165,8 @@ func (Factory) Capabilities() driver.Capabilities {
 }
 func (Factory) BuildTarget(_ context.Context, values driver.FormValues) (driver.BuildTargetResult, error) {
 	target := strings.TrimSpace(values.Database)
+	target = strings.TrimPrefix(target, "sqlite:")
+	target = strings.TrimSpace(target)
 	if target == "" {
 		return driver.BuildTargetResult{OK: false}, validationError(fmt.Errorf("target is required"))
 	}

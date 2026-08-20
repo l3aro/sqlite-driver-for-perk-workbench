@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/l3aro/perk-workbench-plugin-sdk-go/driver"
 	"github.com/l3aro/perk-workbench-plugin-sdk-go/server"
 	"github.com/l3aro/sqlite-driver-for-perk-workbench/internal/drivers/sqlite"
 )
@@ -59,6 +60,16 @@ func TestTransportLifecycleFixture(t *testing.T) {
 	}
 	if !initialized || !builtTarget {
 		t.Fatalf("lifecycle responses missing initialize/build_target: %#v", responses)
+	}
+}
+
+func TestFactoryCapabilities_advertiseSQLiteLabelTarget(t *testing.T) {
+	capabilities := (sqlite.Factory{}).Capabilities()
+	if err := driver.ValidateCapabilities(capabilities); err != nil {
+		t.Fatalf("ValidateCapabilities() = %v", err)
+	}
+	if len(capabilities.Targets) != 1 || capabilities.Targets[0] != (driver.TargetPattern{Prefix: "sqlite:"}) {
+		t.Fatalf("targets = %#v, want sqlite: label target", capabilities.Targets)
 	}
 }
 
